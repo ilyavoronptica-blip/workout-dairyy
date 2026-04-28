@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Дневник тренировок</title>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 600px;
+      margin: 40px auto;
+      background: #111;
+      color: white;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+    }
+    .card {
+      background: #222;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>💪 Дневник тренировок</h1>
+
+<input id="exercise" placeholder="Упражнение">
+<input id="weight" placeholder="Вес (кг)" type="number">
+<input id="reps" placeholder="Повторения" type="number">
+
+<button onclick="addWorkout()">Добавить</button>
+
+<h2>История</h2>
+<div id="list"></div>
+
+<script>
+  let workouts = JSON.parse(localStorage.getItem("workouts")) || [];
+
+  function save() {
+    localStorage.setItem("workouts", JSON.stringify(workouts));
+  }
+
+  function render() {
+    const list = document.getElementById("list");
+    list.innerHTML = "";
+
+    workouts.forEach((w, index) => {
+      list.innerHTML += `
+        <div class="card">
+          <b>${w.exercise}</b><br>
+          Вес: ${w.weight} кг<br>
+          Повторы: ${w.reps}<br>
+          <button onclick="deleteWorkout(${index})">Удалить</button>
+        </div>
+      `;
+    });
+  }
+
+  function addWorkout() {
+    const exercise = document.getElementById("exercise").value;
+    const weight = document.getElementById("weight").value;
+    const reps = document.getElementById("reps").value;
+
+    if (!exercise || !weight || !reps) return;
+
+    workouts.push({ exercise, weight, reps });
+
+    save();
+    render();
+
+    document.getElementById("exercise").value = "";
+    document.getElementById("weight").value = "";
+    document.getElementById("reps").value = "";
+  }
+
+  function deleteWorkout(index) {
+    workouts.splice(index, 1);
+    save();
+    render();
+  }
+
+  render();
+</script>
+
+</body>
+</html>
