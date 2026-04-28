@@ -1,131 +1,141 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Дневник тренировок</title>
+<meta charset="UTF-8">
+<title>Дневник тренировок</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      max-width: 700px;
-      margin: 40px auto;
-      background: #111;
-      color: white;
-    }
+<style>
+body {
+  font-family: Arial;
+  max-width: 700px;
+  margin: 40px auto;
+  background: #111;
+  color: white;
+}
 
-    input, select, button {
-      padding: 10px;
-      margin: 5px 0;
-      width: 100%;
-    }
+input, button {
+  padding: 8px;
+  margin: 5px 0;
+  width: 100%;
+}
 
-    .card {
-      background: #222;
-      padding: 15px;
-      margin-top: 10px;
-      border-radius: 10px;
-    }
-  </style>
+.card {
+  background: #222;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+.exercise {
+  margin-top: 10px;
+  padding-left: 10px;
+  border-left: 2px solid #555;
+}
+</style>
 </head>
 <body>
 
 <h1>💪 Дневник тренировок</h1>
 
-<h3>Добавить тренировку</h3>
-
+<h3>Дата</h3>
 <input id="date" type="date">
-<input id="exercise" placeholder="Упражнение">
 
-<select id="category">
-  <option value="">Выбери категорию</option>
-  <option>Грудь</option>
-  <option>Спина</option>
-  <option>Ноги</option>
-</select>
+<h3>Добавить упражнение</h3>
+<input id="exercise" placeholder="Например: Жим под углом">
+<button onclick="addExercise()">Добавить упражнение</button>
 
-<input id="weight" placeholder="Вес (кг)" type="number">
-<input id="reps" placeholder="Повторения" type="number">
+<div id="currentWorkout"></div>
 
-<button onclick="addWorkout()">Добавить</button>
-
-<h3>Фильтр</h3>
-
-<input id="filterExercise" placeholder="Поиск по упражнению">
-<select id="filterCategory">
-  <option value="">Все категории</option>
-  <option>Грудь</option>
-  <option>Спина</option>
-  <option>Ноги</option>
-</select>
-
-<button onclick="render()">Применить фильтр</button>
+<button onclick="saveWorkout()">💾 Сохранить тренировку</button>
 
 <h2>История</h2>
-<div id="list"></div>
+<div id="history"></div>
 
 <script>
-  let workouts = JSON.parse(localStorage.getItem("workouts")) || [];
+let workouts = JSON.parse(localStorage.getItem("workouts")) || [];
+let current = { date: "", exercises: [] };
 
-  function save() {
-    localStorage.setItem("workouts", JSON.stringify(workouts));
-  }
+function addExercise() {
+  const name = document.getElementById("exercise").value;
+  if (!name) return;
 
-  function render() {
-    const list = document.getElementById("list");
-    list.innerHTML = "";
+  current.exercises.push({
+    name,
+    sets: []
+  });
 
-    const filterExercise = document.getElementById("filterExercise").value.toLowerCase();
-    const filterCategory = document.getElementById("filterCategory").value;
+  document.getElementById("exercise").value = "";
+  renderCurrent();
+}
 
-    const filtered = workouts.filter(w => {
-      return (
-        (!filterExercise || w.exercise.toLowerCase().includes(filterExercise)) &&
-        (!filterCategory || w.category === filterCategory)
-      );
-    });
+function addSet(index) {
+  const weight = prompt("Вес?");
+  const reps = prompt("Повторы?");
 
-    filtered.forEach((w, index) => {
-      list.innerHTML += `
-        <div class="card">
-          📅 ${w.date || "без даты"}<br>
-          <b>${w.exercise}</b><br>
-          🏷 ${w.category}<br>
-          Вес: ${w.weight} кг<br>
-          Повторы: ${w.reps}<br>
-          <button onclick="deleteWorkout(${index})">Удалить</button>
-        </div>
-      `;
-    });
-  }
+  if (!weight || !reps) return;
 
-  function addWorkout() {
-    const date = document.getElementById("date").value;
-    const exercise = document.getElementById("exercise").value;
-    const category = document.getElementById("category").value;
-    const weight = document.getElementById("weight").value;
-    const reps = document.getElementById("reps").value;
+  current.exercises[index].sets.push({ weight, reps });
+  renderCurrent();
+}
 
-    if (!exercise || !weight || !reps || !category) return;
+function renderCurrent() {
+  const div = document.getElementById("currentWorkout");
+  div.innerHTML = "";
 
-    workouts.push({ date, exercise, category, weight, reps });
+  current.exercises.forEach((ex, i) => {
+    div.innerHTML += `
+      <div class="card">
+        <b>${ex.name}</b>
+        <button onclick="addSet(${i})">+ подход</button>
 
-    save();
-    render();
+        ${ex.sets.map(s => `
+          <div>— ${s.weight} кг × ${s.reps}</div>
+        `).join("")}
+      </div>
+    `;
+  });
+}
 
-    document.getElementById("date").value = "";
-    document.getElementById("exercise").value = "";
-    document.getElementById("category").value = "";
-    document.getElementById("weight").value = "";
-    document.getElementById("reps").value = "";
-  }
+function saveWorkout() {
+  const date = document.getElementById("date").value;
+  if (!date || current.exercises.length === 0) return;
 
-  function deleteWorkout(index) {
-    workouts.splice(index, 1);
-    save();
-    render();
-  }
+  workouts.push({
+    date,
+    exercises: current.exercises
+  });
 
-  render();
+  localStorage.setItem("workouts", JSON.stringify(workouts));
+
+  current = { date: "", exercises: [] };
+  document.getElementById("date").value = "";
+
+  renderCurrent();
+  renderHistory();
+}
+
+function renderHistory() {
+  const div = document.getElementById("history");
+  div.innerHTML = "";
+
+  workouts.forEach(w => {
+    div.innerHTML += `
+      <div class="card">
+        📅 ${w.date}
+        ${w.exercises.map(ex => `
+          <div class="exercise">
+            <b>${ex.name}</b>
+            ${ex.sets.map(s => `
+              <div>— ${s.weight} × ${s.reps}</div>
+            `).join("")}
+          </div>
+        `).join("")}
+      </div>
+    `;
+  });
+}
+
+renderHistory();
 </script>
 
 </body>
