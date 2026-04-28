@@ -2,61 +2,113 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Дневник тренировок</title>
 
 <style>
 body {
+  margin: 0;
   font-family: Arial;
-  max-width: 700px;
-  margin: 40px auto;
-  background: #111;
+  background: #0f0f0f;
   color: white;
 }
 
-input, button {
-  padding: 8px;
-  margin: 5px 0;
-  width: 100%;
+/* Контейнер */
+.container {
+  padding: 15px;
+  padding-bottom: 80px;
 }
 
+/* Заголовки */
+h1 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+/* Инпуты */
+input {
+  width: 100%;
+  padding: 14px;
+  margin: 6px 0;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+}
+
+/* Кнопки */
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 6px;
+  border: none;
+  border-radius: 12px;
+  background: #2e7dff;
+  color: white;
+  font-size: 16px;
+}
+
+/* Карточки */
 .card {
-  background: #222;
+  background: #1c1c1c;
   padding: 15px;
+  margin-top: 12px;
+  border-radius: 14px;
+}
+
+/* Упражнение */
+.exercise {
   margin-top: 10px;
+  padding: 10px;
+  background: #2a2a2a;
   border-radius: 10px;
 }
 
-.exercise {
-  margin-top: 10px;
-  padding-left: 10px;
-  border-left: 2px solid #555;
+/* Подход */
+.set {
+  background: #333;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* Фикс кнопка */
+.fab {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  right: 15px;
+  background: #00c853;
+  font-size: 18px;
 }
 </style>
 </head>
 <body>
 
-<h1>💪 Дневник тренировок</h1>
+<div class="container">
 
-<h3>Дата</h3>
+<h1>💪 Тренировка</h1>
+
 <input id="date" type="date">
-
-<h3>Добавить упражнение</h3>
-<input id="exercise" placeholder="Например: Жим под углом">
-<button onclick="addExercise()">Добавить упражнение</button>
 
 <div id="currentWorkout"></div>
 
 <button onclick="saveWorkout()">💾 Сохранить тренировку</button>
 
-<h2>История</h2>
+<h1>📊 История</h1>
 <div id="history"></div>
+
+</div>
+
+<!-- КНОПКА ВНИЗУ -->
+<button class="fab" onclick="addExercise()">+ Упражнение</button>
 
 <script>
 let workouts = JSON.parse(localStorage.getItem("workouts")) || [];
-let current = { date: "", exercises: [] };
+let current = { exercises: [] };
 
 function addExercise() {
-  const name = document.getElementById("exercise").value;
+  const name = prompt("Название упражнения:");
   if (!name) return;
 
   current.exercises.push({
@@ -64,7 +116,6 @@ function addExercise() {
     sets: []
   });
 
-  document.getElementById("exercise").value = "";
   renderCurrent();
 }
 
@@ -89,7 +140,7 @@ function renderCurrent() {
         <button onclick="addSet(${i})">+ подход</button>
 
         ${ex.sets.map(s => `
-          <div>— ${s.weight} кг × ${s.reps}</div>
+          <div class="set">${s.weight} кг × ${s.reps}</div>
         `).join("")}
       </div>
     `;
@@ -107,7 +158,7 @@ function saveWorkout() {
 
   localStorage.setItem("workouts", JSON.stringify(workouts));
 
-  current = { date: "", exercises: [] };
+  current = { exercises: [] };
   document.getElementById("date").value = "";
 
   renderCurrent();
@@ -126,7 +177,7 @@ function renderHistory() {
           <div class="exercise">
             <b>${ex.name}</b>
             ${ex.sets.map(s => `
-              <div>— ${s.weight} × ${s.reps}</div>
+              <div class="set">${s.weight} × ${s.reps}</div>
             `).join("")}
           </div>
         `).join("")}
