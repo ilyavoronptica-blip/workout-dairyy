@@ -3,19 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>Дневник тренировок</title>
+
   <style>
     body {
       font-family: Arial;
-      max-width: 600px;
+      max-width: 700px;
       margin: 40px auto;
       background: #111;
       color: white;
     }
-    input, button {
+
+    input, select, button {
       padding: 10px;
       margin: 5px 0;
       width: 100%;
     }
+
     .card {
       background: #222;
       padding: 15px;
@@ -28,11 +31,34 @@
 
 <h1>💪 Дневник тренировок</h1>
 
+<h3>Добавить тренировку</h3>
+
+<input id="date" type="date">
 <input id="exercise" placeholder="Упражнение">
+
+<select id="category">
+  <option value="">Выбери категорию</option>
+  <option>Грудь</option>
+  <option>Спина</option>
+  <option>Ноги</option>
+</select>
+
 <input id="weight" placeholder="Вес (кг)" type="number">
 <input id="reps" placeholder="Повторения" type="number">
 
 <button onclick="addWorkout()">Добавить</button>
+
+<h3>Фильтр</h3>
+
+<input id="filterExercise" placeholder="Поиск по упражнению">
+<select id="filterCategory">
+  <option value="">Все категории</option>
+  <option>Грудь</option>
+  <option>Спина</option>
+  <option>Ноги</option>
+</select>
+
+<button onclick="render()">Применить фильтр</button>
 
 <h2>История</h2>
 <div id="list"></div>
@@ -48,10 +74,22 @@
     const list = document.getElementById("list");
     list.innerHTML = "";
 
-    workouts.forEach((w, index) => {
+    const filterExercise = document.getElementById("filterExercise").value.toLowerCase();
+    const filterCategory = document.getElementById("filterCategory").value;
+
+    const filtered = workouts.filter(w => {
+      return (
+        (!filterExercise || w.exercise.toLowerCase().includes(filterExercise)) &&
+        (!filterCategory || w.category === filterCategory)
+      );
+    });
+
+    filtered.forEach((w, index) => {
       list.innerHTML += `
         <div class="card">
+          📅 ${w.date || "без даты"}<br>
           <b>${w.exercise}</b><br>
+          🏷 ${w.category}<br>
           Вес: ${w.weight} кг<br>
           Повторы: ${w.reps}<br>
           <button onclick="deleteWorkout(${index})">Удалить</button>
@@ -61,18 +99,22 @@
   }
 
   function addWorkout() {
+    const date = document.getElementById("date").value;
     const exercise = document.getElementById("exercise").value;
+    const category = document.getElementById("category").value;
     const weight = document.getElementById("weight").value;
     const reps = document.getElementById("reps").value;
 
-    if (!exercise || !weight || !reps) return;
+    if (!exercise || !weight || !reps || !category) return;
 
-    workouts.push({ exercise, weight, reps });
+    workouts.push({ date, exercise, category, weight, reps });
 
     save();
     render();
 
+    document.getElementById("date").value = "";
     document.getElementById("exercise").value = "";
+    document.getElementById("category").value = "";
     document.getElementById("weight").value = "";
     document.getElementById("reps").value = "";
   }
