@@ -1,193 +1,635 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Дневник тренировок</title>
-
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0f0f0f;
-  color: white;
-}
-
-/* Контейнер */
-.container {
-  padding: 15px;
-  padding-bottom: 80px;
-}
-
-/* Заголовки */
-h1 {
-  font-size: 22px;
-  margin-bottom: 10px;
-}
-
-/* Инпуты */
-input {
-  width: 100%;
-  padding: 14px;
-  margin: 6px 0;
-  border-radius: 10px;
-  border: none;
-  font-size: 16px;
-}
-
-/* Кнопки */
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 6px;
-  border: none;
-  border-radius: 12px;
-  background: #2e7dff;
-  color: white;
-  font-size: 16px;
-}
-
-/* Карточки */
-.card {
-  background: #1c1c1c;
-  padding: 15px;
-  margin-top: 12px;
-  border-radius: 14px;
-}
-
-/* Упражнение */
-.exercise {
-  margin-top: 10px;
-  padding: 10px;
-  background: #2a2a2a;
-  border-radius: 10px;
-}
-
-/* Подход */
-.set {
-  background: #333;
-  padding: 8px;
-  margin-top: 5px;
-  border-radius: 8px;
-  font-size: 14px;
-}
-
-/* Фикс кнопка */
-.fab {
-  position: fixed;
-  bottom: 15px;
-  left: 15px;
-  right: 15px;
-  background: #00c853;
-  font-size: 18px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>💪 BRO ДНЕВНИК</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #050a0f;
+            color: #eef2ff;
+            padding-bottom: 70px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0f1722e6;
+            backdrop-filter: blur(20px);
+            border-top: 1px solid #2a3848;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 20px;
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: #7e8e9e;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            color: #f59e0b;
+        }
+        .nav-icon {
+            font-size: 1.6rem;
+        }
+        .card {
+            background: #0f1722;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #1f2c3a;
+        }
+        .exercise-card {
+            background: #0a101a;
+            border-radius: 20px;
+            padding: 12px;
+            margin-bottom: 16px;
+            border-left: 4px solid #f59e0b;
+        }
+        button {
+            background: #283747;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        button.primary {
+            background: #d97706;
+        }
+        button.danger {
+            background: #991b1b;
+        }
+        button.outline {
+            background: transparent;
+            border: 1px solid #4b6a8b;
+        }
+        button.small {
+            padding: 4px 12px;
+            font-size: 0.7rem;
+        }
+        .sets-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        .sets-table th, .sets-table td {
+            padding: 6px 4px;
+            text-align: left;
+            border-bottom: 1px solid #1f2a36;
+        }
+        .sets-table th {
+            color: #fbbf24;
+        }
+        input {
+            background: #01060c;
+            border: 1px solid #2c4055;
+            padding: 6px 10px;
+            border-radius: 20px;
+            color: white;
+            width: 75px;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .history-item {
+            background: #0c111c;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .history-date {
+            font-size: 0.7rem;
+            background: #1a2532;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+        .history-details {
+            margin-top: 12px;
+            display: none;
+            border-top: 1px solid #1f2c3a;
+            padding-top: 12px;
+        }
+        .history-details.open {
+            display: block;
+        }
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .search-bar input {
+            flex: 1;
+            width: auto;
+        }
+        .search-result-item {
+            background: #0c111c;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .search-result-date {
+            font-size: 0.7rem;
+            color: #fbbf24;
+            margin-bottom: 6px;
+        }
+        .template-item {
+            background: #0a101a;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h2, h3 {
+            margin-bottom: 16px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #7e8a98;
+        }
+        .unit-tag {
+            font-size: 0.7rem;
+            margin-left: 3px;
+        }
+    </style>
 </head>
 <body>
-
 <div class="container">
+    <!-- ГЛАВНАЯ -->
+    <div id="homePage" class="page active">
+        <h2>🏠 Главная</h2>
+        <div class="card">
+            <div style="font-size: 1.8rem;">💪 Привет, Бро</div>
+            <div style="margin: 8px 0 16px;">Твой дневник тренировок</div>
+            <button id="quickNewBtn" class="primary" style="width:100%;">➕ Новая тренировка</button>
+        </div>
+        <div class="card">
+            <div style="font-weight:bold;">📊 Статистика</div>
+            <div id="statsTotal">Всего тренировок: 0</div>
+            <div id="statsExercises">Всего упражнений: 0</div>
+        </div>
+        <div class="card">
+            <div style="font-weight:bold; margin-bottom:8px;">⭐ Мои шаблоны</div>
+            <div id="templatesList"></div>
+        </div>
+    </div>
 
-<h1>💪 Тренировка</h1>
+    <!-- НОВАЯ ТРЕНИРОВКА -->
+    <div id="newPage" class="page">
+        <h2>📝 Новая тренировка</h2>
+        <div id="exercisesBuilder"></div>
+        <div class="flex-between">
+            <button id="addExerciseBtn" class="outline">➕ Упражнение</button>
+            <button id="saveWorkoutBtn" class="primary">💾 Сохранить</button>
+        </div>
+        <div class="flex-between" style="margin-top:8px;">
+            <button id="saveAsTemplateBtn" class="outline small">⭐ Сохранить как шаблон</button>
+            <button id="clearBuilderBtn" class="danger small">Очистить</button>
+        </div>
+    </div>
 
-<input id="date" type="date">
+    <!-- ИСТОРИЯ -->
+    <div id="historyPage" class="page">
+        <h2>📜 История</h2>
+        <div class="search-bar">
+            <input type="text" id="historySearch" placeholder="🔍 Поиск по упражнению">
+            <button id="clearHistorySearch" class="outline small">Сброс</button>
+        </div>
+        <div id="historyList"></div>
+    </div>
 
-<div id="currentWorkout"></div>
+    <!-- ПОИСК ПРОГРЕССА -->
+    <div id="searchPage" class="page">
+        <h2>🔍 Поиск упражнения</h2>
+        <div class="search-bar">
+            <input type="text" id="progressSearch" placeholder="Например: Румынка, Жим, Брусья">
+            <button id="doSearchBtn" class="primary">Найти</button>
+        </div>
+        <div id="searchResults"></div>
+    </div>
 
-<button onclick="saveWorkout()">💾 Сохранить тренировку</button>
-
-<h1>📊 История</h1>
-<div id="history"></div>
-
+    <!-- НАСТРОЙКИ -->
+    <div id="settingsPage" class="page">
+        <h2>⚙️ Настройки</h2>
+        <div class="card">
+            <div style="font-weight:bold; margin-bottom:8px;">Управление шаблонами</div>
+            <div id="templatesManageList"></div>
+            <button id="exportDataBtn" class="outline" style="width:100%; margin-top:12px;">📤 Экспорт</button>
+            <button id="importDataBtn" class="outline" style="width:100%; margin-top:8px;">📥 Импорт</button>
+            <input type="file" id="importFile" style="display:none;">
+            <button id="clearAllBtn" class="danger" style="width:100%; margin-top:12px;">🗑 Удалить всё</button>
+        </div>
+    </div>
 </div>
 
-<!-- КНОПКА ВНИЗУ -->
-<button class="fab" onclick="addExercise()">+ Упражнение</button>
+<div class="bottom-nav">
+    <button class="nav-item" data-page="home">🏠<span>Главная</span></button>
+    <button class="nav-item" data-page="new">📝<span>Новая</span></button>
+    <button class="nav-item" data-page="history">📜<span>История</span></button>
+    <button class="nav-item" data-page="search">🔍<span>Поиск</span></button>
+    <button class="nav-item" data-page="settings">⚙️<span>Настройки</span></button>
+</div>
 
 <script>
-let workouts = JSON.parse(localStorage.getItem("workouts")) || [];
-let current = { exercises: [] };
+    let workouts = [];
+    let templates = [];
+    let currentExercises = [];
 
-function addExercise() {
-  const name = prompt("Название упражнения:");
-  if (!name) return;
+    // загрузка
+    function loadData() {
+        let w = localStorage.getItem("bro_workouts");
+        let t = localStorage.getItem("bro_templates");
+        if(w) workouts = JSON.parse(w);
+        if(t) templates = JSON.parse(t);
+        renderStats();
+        renderTemplates();
+        renderHistory();
+    }
+    function saveData() {
+        localStorage.setItem("bro_workouts", JSON.stringify(workouts));
+        localStorage.setItem("bro_templates", JSON.stringify(templates));
+        renderStats();
+        renderTemplates();
+        renderHistory();
+    }
 
-  current.exercises.push({
-    name,
-    sets: []
-  });
+    function getUnit(name) {
+        let n = name.toLowerCase();
+        if(n.includes("плит") || n.includes("бабочка") || n.includes("разгибание")) return "плит";
+        return "кг";
+    }
 
-  renderCurrent();
-}
+    function renderBuilder() {
+        let container = document.getElementById("exercisesBuilder");
+        if(!container) return;
+        if(currentExercises.length === 0) {
+            container.innerHTML = `<div class="card" style="text-align:center;">➕ Нажми «Упражнение»</div>`;
+            return;
+        }
+        let html = "";
+        currentExercises.forEach((ex, idx) => {
+            let isSuper = ex.isSuper || false;
+            html += `<div class="exercise-card">
+                        <div class="flex-between">
+                            <span><b>${escapeHtml(ex.name1)}${isSuper ? ` + ${escapeHtml(ex.name2)}` : ''}</b></span>
+                            <div>
+                                <button class="small outline" onclick="window.toggleSuper(${idx})">${isSuper ? '➖ убрать' : '🔗 суперсет'}</button>
+                                <button class="small danger" onclick="window.delEx(${idx})">🗑</button>
+                            </div>
+                        </div>
+                        <table class="sets-table"><tbody id="setsBody${idx}"></tbody></table>
+                        <button class="small outline" onclick="window.addSet(${idx})">+ Подход</button>
+                    </div>`;
+        });
+        container.innerHTML = html;
+        for(let i=0; i<currentExercises.length; i++) {
+            renderSets(i);
+        }
+    }
 
-function addSet(index) {
-  const weight = prompt("Вес?");
-  const reps = prompt("Повторы?");
+    function renderSets(idx) {
+        let ex = currentExercises[idx];
+        let tbody = document.getElementById(`setsBody${idx}`);
+        if(!tbody) return;
+        let html = "";
+        for(let s=0; s<ex.sets.length; s++) {
+            let set = ex.sets[s];
+            if(ex.isSuper) {
+                html += `<tr>
+                            <td><input type="text" value="${set.w1||''}" placeholder="вес" class="setW1" data-ex="${idx}" data-set="${s}"> <span class="unit-tag">${ex.unit1||'кг'}</span></td>
+                            <td><input type="text" value="${set.w2||''}" placeholder="вес" class="setW2" data-ex="${idx}" data-set="${s}"> <span class="unit-tag">${ex.unit2||'кг'}</span></td>
+                            <td><input type="text" value="${set.reps||''}" placeholder="повторы" class="setReps" data-ex="${idx}" data-set="${s}"></td>
+                            <td><button class="small danger" onclick="window.delSet(${idx},${s})">✗</button></td>
+                         </tr>`;
+            } else {
+                html += `<tr>
+                            <td><input type="text" value="${set.weight||''}" placeholder="вес" class="setWeight" data-ex="${idx}" data-set="${s}"> <span class="unit-tag">${ex.unit1||'кг'}</span></td>
+                            <td><input type="text" value="${set.reps||''}" placeholder="повторы" class="setReps" data-ex="${idx}" data-set="${s}"></td>
+                            <td><button class="small danger" onclick="window.delSet(${idx},${s})">✗</button></td>
+                         </tr>`;
+            }
+        }
+        tbody.innerHTML = html;
+        // привязываем события
+        document.querySelectorAll(`.setWeight[data-ex="${idx}"]`).forEach(inp => {
+            inp.onchange = (e) => { let exx=currentExercises[idx]; let sidx=parseInt(inp.dataset.set); exx.sets[sidx].weight=inp.value; };
+        });
+        document.querySelectorAll(`.setW1[data-ex="${idx}"]`).forEach(inp => {
+            inp.onchange = (e) => { let exx=currentExercises[idx]; let sidx=parseInt(inp.dataset.set); exx.sets[sidx].w1=inp.value; };
+        });
+        document.querySelectorAll(`.setW2[data-ex="${idx}"]`).forEach(inp => {
+            inp.onchange = (e) => { let exx=currentExercises[idx]; let sidx=parseInt(inp.dataset.set); exx.sets[sidx].w2=inp.value; };
+        });
+        document.querySelectorAll(`.setReps[data-ex="${idx}"]`).forEach(inp => {
+            inp.onchange = (e) => { let exx=currentExercises[idx]; let sidx=parseInt(inp.dataset.set); exx.sets[sidx].reps=inp.value; };
+        });
+    }
 
-  if (!weight || !reps) return;
+    window.addSet = (idx) => {
+        let ex = currentExercises[idx];
+        if(ex.isSuper) ex.sets.push({w1:"", w2:"", reps:""});
+        else ex.sets.push({weight:"", reps:""});
+        renderSets(idx);
+    };
+    window.delSet = (exIdx, setIdx) => {
+        currentExercises[exIdx].sets.splice(setIdx,1);
+        renderSets(exIdx);
+    };
+    window.delEx = (idx) => {
+        currentExercises.splice(idx,1);
+        renderBuilder();
+    };
+    window.toggleSuper = (idx) => {
+        let ex = currentExercises[idx];
+        if(ex.isSuper) {
+            let newSets = ex.sets.map(s => ({weight: s.w1 || "", reps: s.reps || ""}));
+            ex.isSuper = false;
+            ex.name2 = "";
+            ex.sets = newSets;
+        } else {
+            let name2 = prompt("Второе упражнение для суперсета:", "Разгибания");
+            if(!name2) return;
+            let newSets = ex.sets.map(s => ({w1: s.weight || "", w2: "", reps: s.reps || ""}));
+            ex.isSuper = true;
+            ex.name2 = name2;
+            ex.unit2 = getUnit(name2);
+            ex.sets = newSets;
+        }
+        renderBuilder();
+    };
 
-  current.exercises[index].sets.push({ weight, reps });
-  renderCurrent();
-}
+    function addExercise() {
+        let name = prompt("Название упражнения:");
+        if(!name) return;
+        currentExercises.push({
+            name1: name, isSuper: false, unit1: getUnit(name),
+            sets: [{weight:"", reps:""}]
+        });
+        renderBuilder();
+    }
 
-function renderCurrent() {
-  const div = document.getElementById("currentWorkout");
-  div.innerHTML = "";
+    function saveWorkout() {
+        if(currentExercises.length === 0) return alert("Добавь упражнения");
+        let copy = JSON.parse(JSON.stringify(currentExercises));
+        workouts.unshift({ id: Date.now(), date: Date.now(), exercises: copy });
+        saveData();
+        currentExercises = [];
+        renderBuilder();
+        alert("Сохранено!");
+        showPage('history');
+    }
 
-  current.exercises.forEach((ex, i) => {
-    div.innerHTML += `
-      <div class="card">
-        <b>${ex.name}</b>
-        <button onclick="addSet(${i})">+ подход</button>
+    function saveAsTemplate() {
+        if(currentExercises.length === 0) return alert("Нет упражнений");
+        let name = prompt("Название шаблона:", "Моя тренировка");
+        if(!name) return;
+        let copy = JSON.parse(JSON.stringify(currentExercises));
+        templates.push({ id: Date.now(), name: name, exercises: copy });
+        saveData();
+        alert("Шаблон сохранён");
+    }
 
-        ${ex.sets.map(s => `
-          <div class="set">${s.weight} кг × ${s.reps}</div>
-        `).join("")}
-      </div>
-    `;
-  });
-}
+    function loadTemplate(tpl) {
+        currentExercises = JSON.parse(JSON.stringify(tpl.exercises));
+        renderBuilder();
+        showPage('new');
+    }
 
-function saveWorkout() {
-  const date = document.getElementById("date").value;
-  if (!date || current.exercises.length === 0) return;
+    function deleteTemplate(id) {
+        templates = templates.filter(t => t.id !== id);
+        saveData();
+    }
 
-  workouts.push({
-    date,
-    exercises: current.exercises
-  });
+    function renderTemplates() {
+        let container = document.getElementById("templatesList");
+        let manage = document.getElementById("templatesManageList");
+        if(container) {
+            if(templates.length === 0) container.innerHTML = "<div style='color:#7e8a98;'>Нет шаблонов</div>";
+            else {
+                let html = "";
+                templates.forEach(t => {
+                    html += `<div class="template-item"><span>⭐ ${escapeHtml(t.name)}</span><button class="small outline" onclick="window.loadTpl(${t.id})">Загрузить</button></div>`;
+                });
+                container.innerHTML = html;
+            }
+        }
+        if(manage) {
+            if(templates.length === 0) manage.innerHTML = "<div style='color:#7e8a98;'>Нет шаблонов</div>";
+            else {
+                let html = "";
+                templates.forEach(t => {
+                    html += `<div class="template-item"><span>${escapeHtml(t.name)}</span><button class="small danger" onclick="window.delTpl(${t.id})">Удалить</button></div>`;
+                });
+                manage.innerHTML = html;
+            }
+        }
+    }
+    window.loadTpl = (id) => { let t = templates.find(t=>t.id===id); if(t) loadTemplate(t); };
+    window.delTpl = (id) => { deleteTemplate(id); };
 
-  localStorage.setItem("workouts", JSON.stringify(workouts));
+    function renderHistory() {
+        let container = document.getElementById("historyList");
+        let search = document.getElementById("historySearch")?.value.toLowerCase() || "";
+        let filtered = workouts.filter(w => {
+            if(!search) return true;
+            return w.exercises.some(e => e.name1.toLowerCase().includes(search) || (e.name2 && e.name2.toLowerCase().includes(search)));
+        });
+        if(filtered.length === 0) {
+            container.innerHTML = `<div class="card empty-state">Нет тренировок</div>`;
+            return;
+        }
+        let html = "";
+        filtered.forEach(w => {
+            let d = new Date(w.date);
+            let dateStr = `${d.toLocaleDateString()} ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+            html += `<div class="history-item" data-id="${w.id}">
+                        <div class="history-header">
+                            <span class="history-date">📅 ${dateStr}</span>
+                            <div>
+                                <button class="small outline edit-workout" data-id="${w.id}">✏️</button>
+                                <button class="small danger delete-workout" data-id="${w.id}">🗑</button>
+                            </div>
+                        </div>
+                        <div>${w.exercises.map(e=>e.name1+(e.name2?`+${e.name2}`:'')).join(", ")}</div>
+                        <div class="history-details" data-details="${w.id}"></div>
+                    </div>`;
+        });
+        container.innerHTML = html;
+        filtered.forEach(w => {
+            let detailsDiv = document.querySelector(`.history-details[data-details="${w.id}"]`);
+            if(detailsDiv) {
+                let table = `<table class="sets-table">`;
+                for(let ex of w.exercises) {
+                    table += `<tr><td colspan="2"><b>${escapeHtml(ex.name1)}${ex.isSuper?` + ${escapeHtml(ex.name2)}`:''}</b></td></tr>`;
+                    for(let set of ex.sets) {
+                        if(ex.isSuper) table += `<tr><td>${set.w1||'?'} ${ex.unit1||'кг'}</td><td>${set.w2||'?'} ${ex.unit2||'кг'}</td><td>${set.reps||'?'} раз</td></tr>`;
+                        else table += `<tr><td>${set.weight||'?'} ${ex.unit1||'кг'}</td><td></td><td>${set.reps||'?'} раз</td></tr>`;
+                    }
+                }
+                table += `</table>`;
+                detailsDiv.innerHTML = table;
+            }
+            document.querySelector(`.history-item[data-id="${w.id}"]`).addEventListener('click', (e) => {
+                if(e.target.classList.contains('edit-workout') || e.target.classList.contains('delete-workout')) return;
+                let dd = document.querySelector(`.history-details[data-details="${w.id}"]`);
+                if(dd) dd.classList.toggle('open');
+            });
+        });
+        document.querySelectorAll('.edit-workout').forEach(btn => {
+            btn.onclick = (e) => { e.stopPropagation(); let id = parseInt(btn.dataset.id); editWorkout(id); };
+        });
+        document.querySelectorAll('.delete-workout').forEach(btn => {
+            btn.onclick = (e) => { e.stopPropagation(); let id = parseInt(btn.dataset.id); deleteWorkout(id); };
+        });
+    }
 
-  current = { exercises: [] };
-  document.getElementById("date").value = "";
+    function editWorkout(id) {
+        let w = workouts.find(w=>w.id===id);
+        if(!w) return;
+        currentExercises = JSON.parse(JSON.stringify(w.exercises));
+        renderBuilder();
+        showPage('new');
+    }
+    function deleteWorkout(id) {
+        if(confirm("Удалить?")) { workouts = workouts.filter(w=>w.id!==id); saveData(); }
+    }
 
-  renderCurrent();
-  renderHistory();
-}
+    function searchExercise() {
+        let query = document.getElementById("progressSearch").value.trim().toLowerCase();
+        if(!query) return alert("Введи название упражнения");
+        let results = [];
+        for(let w of workouts) {
+            for(let ex of w.exercises) {
+                let name1 = ex.name1.toLowerCase();
+                let name2 = ex.name2?.toLowerCase() || "";
+                if(name1.includes(query) || name2.includes(query)) {
+                    for(let set of ex.sets) {
+                        let text = "";
+                        if(ex.isSuper) text = `${set.w1||'?'} ${ex.unit1} + ${set.w2||'?'} ${ex.unit2} → ${set.reps||'?'} раз`;
+                        else text = `${set.weight||'?'} ${ex.unit1} → ${set.reps||'?'} раз`;
+                        results.push({ date: w.date, exName: ex.name1+(ex.name2?`+${ex.name2}`:''), setText: text });
+                    }
+                }
+            }
+        }
+        let container = document.getElementById("searchResults");
+        if(results.length === 0) {
+            container.innerHTML = `<div class="card empty-state">Ничего не найдено</div>`;
+            return;
+        }
+        let html = "";
+        for(let r of results) {
+            let d = new Date(r.date);
+            html += `<div class="search-result-item">
+                        <div class="search-result-date">${d.toLocaleDateString()}</div>
+                        <div><b>${escapeHtml(r.exName)}</b></div>
+                        <div style="font-family:monospace;">${escapeHtml(r.setText)}</div>
+                    </div>`;
+        }
+        container.innerHTML = html;
+    }
 
-function renderHistory() {
-  const div = document.getElementById("history");
-  div.innerHTML = "";
+    function renderStats() {
+        let totalEx = workouts.reduce((sum,w)=> sum + w.exercises.length, 0);
+        document.getElementById("statsTotal").innerHTML = `Всего тренировок: ${workouts.length}`;
+        document.getElementById("statsExercises").innerHTML = `Всего упражнений: ${totalEx}`;
+    }
 
-  workouts.forEach(w => {
-    div.innerHTML += `
-      <div class="card">
-        📅 ${w.date}
-        ${w.exercises.map(ex => `
-          <div class="exercise">
-            <b>${ex.name}</b>
-            ${ex.sets.map(s => `
-              <div class="set">${s.weight} × ${s.reps}</div>
-            `).join("")}
-          </div>
-        `).join("")}
-      </div>
-    `;
-  });
-}
+    function exportData() {
+        let data = { workouts, templates };
+        let blob = new Blob([JSON.stringify(data)], {type:"application/json"});
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `bro_backup_${Date.now()}.json`;
+        a.click();
+    }
+    function importData(file) {
+        let reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                let data = JSON.parse(e.target.result);
+                if(data.workouts) workouts = data.workouts;
+                if(data.templates) templates = data.templates;
+                saveData();
+                alert("Импорт готов!");
+            } catch(err) { alert("Ошибка"); }
+        };
+        reader.readAsText(file);
+    }
+    function clearAll() {
+        if(confirm("Удалить ВСЁ?")) { workouts = []; templates = []; saveData(); currentExercises = []; renderBuilder(); }
+    }
 
-renderHistory();
+    function showPage(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`${page}Page`).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
+        if(page === 'history') renderHistory();
+        if(page === 'home') renderStats();
+    }
+
+    function escapeHtml(str) { return String(str).replace(/[&<>]/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+
+    document.getElementById("addExerciseBtn").onclick = () => addExercise();
+    document.getElementById("saveWorkoutBtn").onclick = () => saveWorkout();
+    document.getElementById("clearBuilderBtn").onclick = () => { if(confirm("Очистить?")){ currentExercises=[]; renderBuilder(); } };
+    document.getElementById("quickNewBtn").onclick = () => showPage('new');
+    document.getElementById("saveAsTemplateBtn").onclick = () => saveAsTemplate();
+    document.getElementById("clearHistorySearch").onclick = () => { document.getElementById("historySearch").value=""; renderHistory(); };
+    document.getElementById("historySearch").addEventListener("input", () => renderHistory());
+    document.getElementById("doSearchBtn").onclick = () => searchExercise();
+    document.getElementById("exportDataBtn").onclick = () => exportData();
+    document.getElementById("importDataBtn").onclick = () => document.getElementById("importFile").click();
+    document.getElementById("importFile").onchange = (e) => { if(e.target.files[0]) importData(e.target.files[0]); };
+    document.getElementById("clearAllBtn").onclick = () => clearAll();
+    document.querySelectorAll(".nav-item").forEach(btn => btn.onclick = () => showPage(btn.dataset.page));
+
+    loadData();
+    renderBuilder();
+    showPage('home');
 </script>
-
 </body>
 </html>
